@@ -11,6 +11,10 @@ ATetPawn::ATetPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationRoll = true;
+	bUseControllerRotationYaw = true;
+
 	RootComponent = m_playerCamera;
 	m_playerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("mainCamera"));
 	m_playerCamera->ProjectionMode = ECameraProjectionMode::Orthographic;
