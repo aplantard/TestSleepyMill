@@ -4,11 +4,15 @@
 
 #include "Components/TetPaperGroupedSpriteComponent.h"
 #include "PaperSprite.h"
+#include "BaseBlock.h"
 
 ATetGrid::ATetGrid()
 {
 	m_paperGroupedSpriteComponent = CreateDefaultSubobject<UTetPaperGroupedSpriteComponent>(TEXT("PaperGroupedSpriteComponent"));
 	RootComponent = m_paperGroupedSpriteComponent;
+
+	m_spawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SpawnPoint"));
+	m_spawnLocation->SetupAttachment(m_paperGroupedSpriteComponent);
 }
 
 ATetGrid::~ATetGrid()
@@ -16,9 +20,9 @@ ATetGrid::~ATetGrid()
 }
 	
 
-void ATetGrid::OnConstruction(const FTransform& Transform)
+void ATetGrid::OnConstruction(const FTransform& a_transform)
 {
-	Super::OnConstruction(Transform);
+	Super::OnConstruction(a_transform);
 
 	if (m_paperGroupedSpriteComponent && m_blockSprite && m_emptyBlockSprite)
 	{
@@ -71,5 +75,18 @@ void ATetGrid::OnConstruction(const FTransform& Transform)
 			currentTransform.SetLocation(currentLocation);
 
 		}
+
+		// place spawn location
+		m_spawnLocation->SetRelativeLocation(FVector((blockSize.X * ((m_numCol+2)/2)) + (blockSize.X/2), -blockSize.Y,0));
 	}
+}
+
+ABaseBlock* ATetGrid::SpawnBlock()
+{
+	return GetWorld()->SpawnActor<ABaseBlock>(m_objectToSpawn, m_spawnLocation->GetComponentTransform());
+}
+
+int ATetGrid::GetBlockSize()
+{
+	return m_blockSprite->GetSourceSize().X;
 }

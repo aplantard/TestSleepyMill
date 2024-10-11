@@ -15,6 +15,6 @@ class TESTSLEEPYMILL_API UTetPaperGroupedSpriteComponent : public UPaperGroupedS
 	GENERATED_BODY()
 	
 public: 
-	virtual void OnUpdateTransform(EUpdateTransformFlags UpdateTransformFlags, ETeleportType Teleport) override;
+	virtual void OnUpdateTransform(EUpdateTransformFlags a_updateTransformFlags, ETeleportType a_teleport) override;
 
 };

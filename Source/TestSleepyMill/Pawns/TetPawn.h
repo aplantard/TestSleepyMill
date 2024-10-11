@@ -18,7 +18,7 @@ public:
 	ATetPawn();
 
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float a_deltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned

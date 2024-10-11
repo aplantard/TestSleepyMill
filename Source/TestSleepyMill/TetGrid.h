@@ -8,6 +8,7 @@
 
 class UPaperSprite;
 class UTetPaperGroupedSpriteComponent;
+class ABaseBlock;
 
 UCLASS()
 class TESTSLEEPYMILL_API ATetGrid : public AActor
@@ -18,7 +19,7 @@ public:
 	ATetGrid();
 	~ATetGrid();
 
-	virtual void OnConstruction(const FTransform& Transform) override;;
+	virtual void OnConstruction(const FTransform& a_transform) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0"))
 	int m_numCol = 3;
@@ -35,6 +36,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTetPaperGroupedSpriteComponent* m_paperGroupedSpriteComponent;
 
-private:
-	TArray<TArray<bool>> m_gridCellOccupied;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USceneComponent* m_spawnLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<ABaseBlock> m_objectToSpawn;
+
+	UFUNCTION(BlueprintCallable)
+	FTransform GetSpawnLocation() { return m_spawnLocation->GetComponentTransform(); };
+
+	UFUNCTION(BlueprintCallable)
+	ABaseBlock* SpawnBlock();
+
+	UFUNCTION(BlueprintCallable)
+	int GetBlockSize();
+
+
 };

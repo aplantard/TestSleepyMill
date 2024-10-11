@@ -8,6 +8,8 @@
 
 class UInputMappingContext;
 class UInputAction;
+class ATetGrid;
+class ABaseBlock;
 
 UCLASS()
 class TESTSLEEPYMILL_API ATetPlayerController : public APlayerController
@@ -32,6 +34,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TSoftObjectPtr<UInputAction> m_moveBlockDownInputAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game")
+	TSoftObjectPtr<ATetGrid> m_gameGrid;
+
 	UFUNCTION()
 	void RotatePiece(const FInputActionValue& a_value);
 
@@ -40,4 +45,6 @@ protected:
 
 	UFUNCTION()
 	void MovePieceDown(const FInputActionValue& a_value);
+
+	TSoftObjectPtr<ABaseBlock> m_currentControlledBlock = nullptr;
 };
