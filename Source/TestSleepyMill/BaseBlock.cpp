@@ -15,6 +15,7 @@ ABaseBlock::ABaseBlock()
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SpawnPoint"));
 	RootComponent = m_rootComponent;
 
+	GetRenderComponent()->SetupAttachment(m_rootComponent);
 	GetRenderComponent()->AddWorldRotation(FRotator(0, 0, -90));
 }
 
