@@ -66,8 +66,22 @@ void ATetPlayerController::MovePiece(const FInputActionValue& a_value)
 	{
 		int blockSize = m_gameGrid->GetBlockSize();
 		FVector newPosition = m_currentControlledBlock->GetActorLocation() + (MovementVector * blockSize);
-		m_currentControlledBlock->AddActorWorldOffset(newPosition - m_currentControlledBlock->GetActorLocation());
+		if (CanMovePiece(m_currentControlledBlock.Get(), newPosition - m_currentControlledBlock->GetActorLocation()))
+		{
+			m_currentControlledBlock->AddActorWorldOffset(newPosition - m_currentControlledBlock->GetActorLocation());
+		}
 	}
+}
+
+bool ATetPlayerController::CanMovePiece(ABaseBlock* a_block, FVector a_vectorToAdd)
+{
+	int blockSize = m_gameGrid->GetBlockSize();
+	FVector gridLocation = m_gameGrid->GetActorLocation();
+	FVector gridWorldLocation = gridLocation + (FVector(1, 0, 0) * blockSize);
+	FVector endgridWorldLocation = gridLocation + ((m_gameGrid->m_numCol + 1) * blockSize);
+	FVector newBlockLocation = a_block->GetActorLocation() + a_vectorToAdd;
+
+	return (newBlockLocation - gridWorldLocation).X > 0 && (newBlockLocation - endgridWorldLocation).X < 0;
 }
 
 void ATetPlayerController::MovePieceDown(const FInputActionValue& a_value)

@@ -44,6 +44,9 @@ protected:
 	void MovePiece(const FInputActionValue& a_value);
 
 	UFUNCTION()
+	bool CanMovePiece(ABaseBlock* a_block, FVector a_vectorToAdd);
+
+	UFUNCTION()
 	void MovePieceDown(const FInputActionValue& a_value);
 
 	TSoftObjectPtr<ABaseBlock> m_currentControlledBlock = nullptr;
