@@ -4,6 +4,7 @@
 #include "BaseBlock.h"
 
 #include "PaperGroupedSpriteComponent.h"
+#include "Components/TextRenderComponent.h"
 
 // Sets default values
 ABaseBlock::ABaseBlock()
@@ -15,7 +16,38 @@ ABaseBlock::ABaseBlock()
 	RootComponent = m_rootComponent;
 
 	GetRenderComponent()->SetupAttachment(m_rootComponent);
-	GetRenderComponent()->AddWorldRotation(FRotator(0, 0, -90));
+}
+
+void ABaseBlock::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UPaperGroupedSpriteComponent* renderComponent = GetRenderComponent();
+	for (int i = 0; i < renderComponent->GetInstanceCount(); ++i)
+	{
+		FTransform currentBlockTranform;
+		renderComponent->GetInstanceTransform(i, currentBlockTranform, false);
+
+		UTextRenderComponent* currentTextRenderComponent = Cast<UTextRenderComponent>(AddComponentByClass(UTextRenderComponent::StaticClass(), true, currentBlockTranform, false));
+		currentTextRenderComponent->AttachToComponent(m_rootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		currentTextRenderComponent->RegisterComponent();
+		currentTextRenderComponent->CreationMethod = EComponentCreationMethod::Instance;
+
+		currentTextRenderComponent->HorizontalAlignment = EHorizTextAligment::EHTA_Center;
+		currentTextRenderComponent->VerticalAlignment = EVerticalTextAligment::EVRTA_TextCenter;
+		currentTextRenderComponent->SetTextRenderColor(FColor::Black);
+
+		currentTextRenderComponent->SetRelativeRotation(FRotator(90, 0, -90));
+		currentTextRenderComponent->AddWorldOffset(FVector(0,0,1));
+
+		currentTextRenderComponent->TranslucencySortPriority = 2;
+
+		TCHAR currentChar = FMath::RandRange((int)'A', (int)'Z');
+		FString currentCharStr = FString::Chr(currentChar);
+		currentTextRenderComponent->SetText(FText::FromString(currentCharStr));
+
+		m_lettersOnPiece.Add(i, currentTextRenderComponent);
+	}
 }
 
 

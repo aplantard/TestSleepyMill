@@ -8,6 +8,7 @@
 #include "InputMappingContext.h"
 #include "PaperGroupedSpriteComponent.h"
 #include "Components/TetPaperGroupedSpriteComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "TetGrid.h"
 #include "BaseBlock.h"
 
@@ -60,11 +61,19 @@ void ATetPlayerController::RotatePiece(const FInputActionValue& a_value)
 	float rotationSide = a_value.Get<float>();
 	rotationSide = rotationSide / FMath::Abs(rotationSide);
 
+	// Rotate the actual piece
 	if (m_currentControlledBlock)
 	{
-		m_currentControlledBlock->AddActorLocalRotation(FRotator(0, rotationSide * 90,0).Quaternion());
+		m_currentControlledBlock->AddActorLocalRotation(FRotator(0, rotationSide * 90, 0).Quaternion());
 	}
 
+	//Rotate letter inside piece to be readable
+	for (int i = 0; i < m_currentControlledBlock->m_lettersOnPiece.Num(); ++i)
+	{
+		m_currentControlledBlock->m_lettersOnPiece[i]->SetWorldRotation(FRotator(90, 90, 0).Quaternion());
+	}
+	
+	// Manage slide if rotate make the piece overlap the grid boudaries
 	FVector deltaVectorToMove = FVector::Zero();
 	int blockSize = m_gameGrid->GetBlockSize();
 
@@ -106,7 +115,6 @@ void ATetPlayerController::RotatePiece(const FInputActionValue& a_value)
 	if (deltaVectorToMove != FVector::Zero())
 	{
 		m_currentControlledBlock->AddActorWorldOffset(deltaVectorToMove);
-		m_currentControlledBlock->GetRenderComponent()->OnUpdateTransform(EUpdateTransformFlags::PropagateFromParent, ETeleportType::TeleportPhysics);
 	}
 }
 

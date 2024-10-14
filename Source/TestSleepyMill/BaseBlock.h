@@ -8,6 +8,7 @@
 
 class UPaperSprite;
 class UFloatingPawnMovement;
+class UTextRenderComponent;
 
 UCLASS()
 class TESTSLEEPYMILL_API ABaseBlock : public APaperGroupedSpriteActor
@@ -20,5 +21,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneComponent* m_rootComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<int32, UTextRenderComponent*> m_lettersOnPiece;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 };
