@@ -10,6 +10,44 @@ class UPaperSprite;
 class UTetPaperGroupedSpriteComponent;
 class ABaseBlock;
 
+USTRUCT(BlueprintType)
+struct FGridCellData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int m_instanceIdx = -1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ABaseBlock* m_pieceOnCell = nullptr;
+
+};
+
+USTRUCT(BlueprintType)
+struct FGridRow
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	TArray<FGridCellData> m_cellData;
+
+	void Add(FGridCellData a_cellData)
+	{
+		m_cellData.Add(a_cellData);
+	}
+
+	int Num() const
+	{
+		return m_cellData.Num();
+	}
+
+	FGridCellData& operator[] (int32 a_cellDataIdx)
+	{
+		return m_cellData[a_cellDataIdx];
+	}
+
+};
+
 UCLASS()
 class TESTSLEEPYMILL_API ATetGrid : public AActor
 {
@@ -38,18 +76,22 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USceneComponent* m_spawnLocation;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ABaseBlock> m_objectToSpawn;
+	TArray<TSubclassOf<ABaseBlock>> m_blockToSpawn;
+
+	UPROPERTY()
+	TArray<FGridRow> m_gridData;
 
 	UFUNCTION(BlueprintCallable)
 	FTransform GetSpawnLocation() { return m_spawnLocation->GetComponentTransform(); };
 
 	UFUNCTION(BlueprintCallable)
-	ABaseBlock* SpawnBlock();
+	ABaseBlock* SpawnPiece();
 
 	UFUNCTION(BlueprintCallable)
 	int GetBlockSize();
 
-
+	UFUNCTION()
+	bool CanMovePiece(int a_row, int a_col, FVector a_vectorToAdd);
 };

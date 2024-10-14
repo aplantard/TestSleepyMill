@@ -9,10 +9,12 @@
 ATetGrid::ATetGrid()
 {
 	m_paperGroupedSpriteComponent = CreateDefaultSubobject<UTetPaperGroupedSpriteComponent>(TEXT("PaperGroupedSpriteComponent"));
+	m_paperGroupedSpriteComponent->TranslucencySortPriority = -5;
 	RootComponent = m_paperGroupedSpriteComponent;
 
 	m_spawnLocation = CreateDefaultSubobject<USceneComponent>(TEXT("SpawnPoint"));
 	m_spawnLocation->SetupAttachment(m_paperGroupedSpriteComponent);
+
 }
 
 ATetGrid::~ATetGrid()
@@ -26,6 +28,18 @@ void ATetGrid::OnConstruction(const FTransform& a_transform)
 
 	if (m_paperGroupedSpriteComponent && m_blockSprite && m_emptyBlockSprite)
 	{
+		m_gridData.Empty();
+
+		//Fill Grid data with empty values
+		for (int row = 0; row < m_numRow; row++)
+		{
+			m_gridData.Add(FGridRow());
+			for (int col = 0; col < m_numCol; col++)
+			{
+				m_gridData[row].Add(FGridCellData());
+			}
+		}
+
 		m_paperGroupedSpriteComponent->ClearInstances();
 
 		FVector2D blockSize = m_blockSprite->GetSourceSize();
@@ -77,16 +91,63 @@ void ATetGrid::OnConstruction(const FTransform& a_transform)
 		}
 
 		// place spawn location
-		m_spawnLocation->SetRelativeLocation(FVector((blockSize.X * ((m_numCol+2)/2)) + (blockSize.X/2), -blockSize.Y,0));
+		m_spawnLocation->SetRelativeLocation(FVector((blockSize.X * FMath::Floor(m_numCol/2)) + (blockSize.X/2), -1.5f*(blockSize.Y),0));
 	}
 }
 
-ABaseBlock* ATetGrid::SpawnBlock()
+ABaseBlock* ATetGrid::SpawnPiece()
 {
-	return GetWorld()->SpawnActor<ABaseBlock>(m_objectToSpawn, m_spawnLocation->GetComponentTransform());
+	int32 idx = FMath::RandRange(0, m_blockToSpawn.Num() - 1);
+
+	FTransform spawnLocationTransform = m_spawnLocation->GetComponentTransform();
+
+	ABaseBlock* spawnedPiece = GetWorld()->SpawnActor<ABaseBlock>(m_blockToSpawn[idx], spawnLocationTransform);
+	FVector deltaVectorToMove = FVector::One() * 1000;
+
+	UPaperGroupedSpriteComponent* renderComponent = spawnedPiece->GetRenderComponent();
+	for (int i = 0; i < renderComponent->GetInstanceCount(); ++i)
+	{
+		FTransform currentBlockTranform;
+		renderComponent->GetInstanceTransform(i, currentBlockTranform, true);
+		FVector currentBlockLocation = currentBlockTranform.GetTranslation();
+
+		FVector deltaVector = currentBlockLocation - spawnLocationTransform.GetTranslation();
+
+		if (deltaVector.IsZero())
+		{
+			return spawnedPiece;
+		}
+		else if (deltaVector.SizeSquared() < deltaVectorToMove.SizeSquared())
+		{
+			deltaVectorToMove = deltaVector;
+		}
+	}
+
+	spawnedPiece->AddActorWorldOffset(deltaVectorToMove);
+
+	return spawnedPiece;
 }
 
 int ATetGrid::GetBlockSize()
 {
 	return m_blockSprite->GetSourceSize().X;
+}
+
+bool ATetGrid::CanMovePiece(int a_row, int a_col, FVector a_vectorToAdd)
+{
+	a_vectorToAdd.Normalize();
+	FVector piecePositionInGrid = FVector(a_col, a_row, 0);
+	FVector newPiecePosition = piecePositionInGrid + a_vectorToAdd;
+
+	if (newPiecePosition.Y >= m_numRow || newPiecePosition.X < 0 || newPiecePosition.X >= m_numCol)
+	{
+		return false;
+	}
+
+	if (newPiecePosition.Y >= 0 && m_gridData[newPiecePosition.Y][newPiecePosition.X].m_pieceOnCell != nullptr)
+	{
+		return false;
+	}
+
+	return true;
 }

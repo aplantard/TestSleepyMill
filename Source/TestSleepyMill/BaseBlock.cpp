@@ -4,7 +4,6 @@
 #include "BaseBlock.h"
 
 #include "PaperGroupedSpriteComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
 
 // Sets default values
 ABaseBlock::ABaseBlock()
